@@ -145,13 +145,13 @@ Default: build all examples that have their package dependencies met, e.g.:
             targets = self.env['targets']
             if self.env['target_relative_cwd']:
                 cwd = self._get_cwd()
-                targets = [os.path.join(cwd, target) for target in targets]
-            return targets
+                for target in targets:
+                    yield os.path.join(cwd, target)
         else:
             if self.env['target_relative_cwd']:
-                return [self._get_cwd()]
+                yield self._get_cwd()
             else:
-                return [self.env['userland_source_dir']]
+                yield self.env['userland_source_dir']
 
     def build(self):
         build_dir = self.get_build_dir()
@@ -366,7 +366,7 @@ Default: build all examples that have their package dependencies met, e.g.:
         if self.env['in_tree']:
             for target in self._get_targets():
                 if os.path.exists(target):
-                    for path, dirnames, filenames in os.walk(target):
+                    for path, dirnames, filenames in self.sh.walk(target):
                         filenames.sort()
                         dirnames.sort()
                         for filename in filenames:
